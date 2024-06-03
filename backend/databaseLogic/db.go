@@ -1,4 +1,4 @@
-package main
+package databaseLogic
 
 import (
 	"database/sql"

@@ -6,17 +6,23 @@ import (
 
 	"github.com/rs/cors"
 
-	"github.com/pasquale-sergi/expense-tracker/database"
+	"github.com/pasquale-sergi/expense-tracker/databaseLogic"
 	"github.com/pasquale-sergi/expense-tracker/handlers"
-	// "github.com/pasquale-sergi/expense-tracker/user"
 )
 
 func main() {
-	db := database.DbConnection()
+	db := databaseLogic.DbConnection()
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/login", handlers.LoginHandler(db))
 	mux.HandleFunc("/register", handlers.RegisterHandler(db))
+	mux.HandleFunc("/expenses", handlers.ExpensesHandler(db))
+
+	// response, err := user.ShowExpensesOfTheMonth(db, 1)
+	// if err != nil {
+	// 	fmt.Printf("Error returning the expenses list: ", err)
+	// }
+	// fmt.Print(response)
 
 	handler := cors.Default().Handler(mux)
 
