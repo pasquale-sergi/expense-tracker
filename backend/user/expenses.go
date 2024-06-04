@@ -38,11 +38,10 @@ func ShowExpensesOfTheMonth(db *sql.DB, userID int) ([]Expense, error) {
 
 	firstDayOfMonth := time.Date(currentDate.Year(), currentDate.Month(), 1, 0, 0, 0, 0, time.UTC)
 	lastDayOfMonth := firstDayOfMonth.AddDate(0, 1, -1)
-	fmt.Print(firstDayOfMonth, lastDayOfMonth)
 
 	rows, err := db.Query(query, userID, lastDayOfMonth, firstDayOfMonth)
 	if err != nil {
-		return nil, fmt.Errorf("Error with executing query about expensens of the month")
+		return nil, err
 	}
 	defer rows.Close()
 
@@ -58,4 +57,44 @@ func ShowExpensesOfTheMonth(db *sql.DB, userID int) ([]Expense, error) {
 
 	return expenses, nil
 
+}
+
+func ShowExpensesHistory(db *sql.DB, userID int) ([]Expense, error) {
+	query := `SELECT * FROM expenses WHERE userid = $1`
+
+	rows, err := db.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var expenses []Expense
+	for rows.Next() {
+		var expense Expense
+		if err := rows.Scan(&expense.ExpenseID, &expense.UserID, &expense.CategoryID, &expense.Amount, &expense.Description, &expense.Date, &expense.CreatedAt); err != nil {
+			fmt.Printf("error scanning row: %v ", err)
+		}
+		expenses = append(expenses, expense)
+	}
+	return expenses, nil
+}
+
+func GetExpensesByUserID(db *sql.DB, userID int) ([]Expense, error) {
+	query := "SELECT expenseid, amount, categoryid, description, date FROM expenses WHERE userID = $1"
+	rows, err := db.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var expenses []Expense
+	for rows.Next() {
+		var expense Expense
+		if err := rows.Scan(&expense.ExpenseID, &expense.Amount, &expense.CategoryID, &expense.Description, &expense.Date); err != nil {
+			return nil, err
+		}
+		expenses = append(expenses, expense)
+	}
+	return expenses, nil
 }

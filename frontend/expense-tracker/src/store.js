@@ -2,6 +2,7 @@
 import { createStore } from 'vuex'
 import axios from 'axios'
 import router from './routes'
+import createPersistedState from 'vuex-persistedstate'
 
 
 const store = createStore({
@@ -48,6 +49,10 @@ const store = createStore({
                 commit('set_registered_status', { success: false })
                 console.error("Error calling the registration API: ", error)
             }
+        },
+        logout({ commit }) {
+            commit('set_login_status', { success: false })
+            router.push("/login")
         }
 
     },
@@ -55,7 +60,9 @@ const store = createStore({
         isLogged: (state) => state.isLogged,
         loginMessage: (state) => state.loginMessage,
         isRegistered: (state) => state.isRegistered,
-    }
+    },
+
+    plugins: [createPersistedState()],
 });
 
 export default store;

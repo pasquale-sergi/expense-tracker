@@ -1,31 +1,31 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
-	"github.com/rs/cors"
-
+	"github.com/gin-gonic/gin"
 	"github.com/pasquale-sergi/expense-tracker/databaseLogic"
-	"github.com/pasquale-sergi/expense-tracker/handlers"
+	"github.com/pasquale-sergi/expense-tracker/middleware"
+	"github.com/pasquale-sergi/expense-tracker/user"
 )
 
+func init() {
+	databaseLogic.LoadEnvVariables()
+	databaseLogic.DbConnection()
+}
+
 func main() {
-	db := databaseLogic.DbConnection()
-	mux := http.NewServeMux()
 
-	mux.HandleFunc("/login", handlers.LoginHandler(db))
-	mux.HandleFunc("/register", handlers.RegisterHandler(db))
-	mux.HandleFunc("/expenses", handlers.ExpensesHandler(db))
+	r := gin.Default()
 
-	// response, err := user.ShowExpensesOfTheMonth(db, 1)
-	// if err != nil {
-	// 	fmt.Printf("Error returning the expenses list: ", err)
-	// }
-	// fmt.Print(response)
+	r.POST("/signup", user.Signup)
+	r.POST("/login", user.Login)
 
-	handler := cors.Default().Handler(mux)
+	r.GET("/validate", middleware.RequireAuth, user.Validate)
 
-	log.Fatal(http.ListenAndServe(":8090", handler))
+	r.Run()
+
+	// mux.Handle("/expenses", handlers.ExpensesHandler(db))
+	// mux.Handle("/expensesHistory", handlers.ExpenseHistoryHandler(db))
+
+	// log.Fatal(http.ListenAndServe(":8090", handler))
 
 }

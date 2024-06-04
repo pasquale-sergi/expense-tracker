@@ -1,45 +1,31 @@
 package databaseLogic
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-func DbConnection() *sql.DB {
+var DB *gorm.DB
 
+func LoadEnvVariables() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Printf("error with the .env file")
 	}
-	host := os.Getenv("HOST")
-	portStr := os.Getenv("PORT")
-	user := os.Getenv("USER")
-	password := os.Getenv("PASSWORD")
-	dbname := os.Getenv("DBNAME")
+}
+func DbConnection() {
+	var err error
+	dsn := os.Getenv("DB")
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		panic(err)
+		panic("Failed to connect to db")
 	}
+	fmt.Print("Connected to database")
 
-	dbInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-
-	db, err := sql.Open("postgres", dbInfo)
-	if err != nil {
-		fmt.Print("Error with opening the db connection")
-	}
-	// defer db.Close()
-
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("Established a connection!")
-	return db
 }

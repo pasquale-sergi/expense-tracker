@@ -4,6 +4,7 @@ import HomePage from "./components/HomePage.vue"
 import RegisterUser from "./components/RegisterUser.vue"
 import ExpensesList from "./components/ExpensesList.vue"
 
+
 const routes = [
     { path: '/', redirect: '/login' },
     {
@@ -19,7 +20,6 @@ const routes = [
         path: "/expenses",
         component: ExpensesList
     }
-
 ];
 
 const router = createRouter({

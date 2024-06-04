@@ -1,33 +1,115 @@
 package user
 
 import (
-	"database/sql"
-	"fmt"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/pasquale-sergi/expense-tracker/databaseLogic"
+	"golang.org/x/crypto/bcrypt"
 )
 
-func RegisterUser(db *sql.DB, username, email, password string) error {
-	query := `INSERT INTO users(username, email, password) VALUES ($1,$2,$3)`
-
-	_, err := db.Exec(query, username, email, password)
-	if err != nil {
-		return fmt.Errorf("Error inserting user into database: %s", err)
-	}
-	fmt.Println("User registered")
-	return nil
-
+type User struct {
+	ID       uint   `gorm: "primary key"`
+	Username string `gorm: "unique"`
+	Email    string `gorm: "unique"`
+	Password string
 }
 
-func LoginUser(db *sql.DB, username, password string) error {
-	query := `SELECT id FROM users WHERE EXISTS (SELECT 1 FROM users WHERE username = $1 AND password = $2)`
-
-	var exist bool
-	err := db.QueryRow(query, username, password).Scan(&exist)
+func Signup(c *gin.Context) {
+	//Get the email/pass off the req
+	var body struct {
+		Username string
+		Email    string
+		Password string
+	}
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to read body",
+		})
+		return
+	}
+	//Hash the password
+	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
 
 	if err != nil {
-		fmt.Println("User does not found")
-		return err
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to hash password",
+		})
+		return
 	}
 
-	fmt.Printf("Welcome back %s!", username)
-	return nil
+	//Create the user
+	user := User{Username: body.Username, Email: body.Email, Password: string(hash)}
+	result := databaseLogic.DB.Create(&user)
+
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed create user",
+		})
+		return
+	}
+
+	//Response
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+func Login(c *gin.Context) {
+	//get email and passw from req body
+	var body struct {
+		Username string
+		Password string
+	}
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to read body",
+		})
+		return
+	}
+	// look up requested user
+	var user User
+	databaseLogic.DB.First(&user, "username = ?", body.Username)
+	if user.ID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid email or password",
+		})
+
+		return
+	}
+	//compare sent in pass with saved hash pass
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Password Incorrect",
+		})
+		return
+	}
+	//generate a jtw token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": user.ID,
+		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+	})
+	//sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString([]byte(os.Getenv("SESSION_SECRET_KEY")))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed generating token",
+		})
+		return
+	}
+
+	//send it back
+	//set the cookie
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+func Validate(c *gin.Context) {
+	user, _ := c.Get("user")
+	c.JSON(http.StatusOK, gin.H{
+		"message": user,
+	})
 }
