@@ -107,9 +107,12 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
+var userID uint
+
 func Validate(c *gin.Context) {
 	user, _ := c.Get("user")
+	userID = user.(User).ID
 	c.JSON(http.StatusOK, gin.H{
-		"message": user,
+		"message": userID,
 	})
 }

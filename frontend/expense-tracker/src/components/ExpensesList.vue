@@ -33,24 +33,12 @@ export default {
     };
   },
   created() {
-    this.expensesList();
+    this.getCurrentExpenses();
   },
   methods: {
-    async expensesList() {
-      const userID = 2;
-
-      const response = await axios.get(
-        "http://localhost:8090/expenses",
-        userID
-      );
-      this.expenses = response.data;
+    async getCurrentExpenses() {
+      const response = await axios.get("http://localhost:8090/currentExpenses");
       console.log(response);
-    },
-    async showExpHistory() {
-      axios.defaults.withCredentials = true;
-      this.showHistory = !this.showHistory;
-      const response = await axios.get("http://localhost:8090/expensesHistory");
-      this.expensesHistory = response.data;
     },
   },
 };

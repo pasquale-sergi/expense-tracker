@@ -1,100 +1,103 @@
 package user
 
 import (
-	"database/sql"
 	"fmt"
+	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/pasquale-sergi/expense-tracker/databaseLogic"
 )
 
-type ExpenseRequest struct {
-	UserID      int       `json:"userid"`
-	CategoryID  int       `json:"categoryid"`
-	Amount      float64   `json:"amount"`
-	Description string    `json:"description"`
-	Date        time.Time `json:"date"`
-}
-
 type Expense struct {
-	ExpenseID   int
-	UserID      int
+	expenseid   uint `gorm: "primaryKey"`
+	Userid      uint
+	Categoryid  uint
 	Amount      float64
-	CategoryID  int
 	Description string
 	Date        time.Time
-	CreatedAt   time.Time
 }
 
-func AddExpense(db *sql.DB) error {
-	query := `INSERT INTO expenses(userid, categoryid, amount,description, date, createdat) VALUES ($1,$2,$3,$4,$5,$6)`
-	var req ExpenseRequest
-	_, err := db.Exec(query, req.UserID, req.CategoryID, req.Amount, req.Description, req.Date)
-	return err
-
-}
-
-func ShowExpensesOfTheMonth(db *sql.DB, userID int) ([]Expense, error) {
-	query := `SELECT * FROM expenses WHERE userid = $1 AND date <= $2 AND date >= $3`
-	currentDate := time.Now()
-
-	firstDayOfMonth := time.Date(currentDate.Year(), currentDate.Month(), 1, 0, 0, 0, 0, time.UTC)
-	lastDayOfMonth := firstDayOfMonth.AddDate(0, 1, -1)
-
-	rows, err := db.Query(query, userID, lastDayOfMonth, firstDayOfMonth)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
+func ListExpenses(c *gin.Context) {
 
 	var expenses []Expense
-	for rows.Next() {
-		var expense Expense
 
-		if err := rows.Scan(&expense.ExpenseID, &expense.UserID, &expense.CategoryID, &expense.Amount, &expense.Description, &expense.Date, &expense.CreatedAt); err != nil {
-			return nil, fmt.Errorf("error scanning row: %v", err)
-		}
-		expenses = append(expenses, expense)
+	result := databaseLogic.DB.Where("userid = ?", userID).Find(&expenses)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
 	}
 
-	return expenses, nil
+	c.JSON(http.StatusOK, expenses) // Return all expenses data
+}
+
+func ListExpensesCurrentMonth(c *gin.Context) {
+	// Get the current time
+	now := time.Now()
+	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+
+	// Determine the start of the next month and then subtract 1 nanosecond to get the end of the current month
+	startOfNextMonth := startOfMonth.AddDate(0, 1, 0)
+	endOfMonth := startOfNextMonth.Add(-time.Nanosecond)
+
+	// Create a slice to hold the existing expenses
+	var expenses []Expense
+	var tempExpenses []Expense
+
+	// Query the database
+	result := databaseLogic.DB.Where("userid = ? AND date BETWEEN ? AND ?", userID, startOfMonth, endOfMonth).Find(&tempExpenses)
+
+	// Check for errors
+	if result.Error != nil {
+		fmt.Println("Failed to retrieve records:", result.Error)
+		return
+	}
+
+	expenses = append(expenses, tempExpenses...)
+	c.JSON(http.StatusOK, expenses)
 
 }
 
-func ShowExpensesHistory(db *sql.DB, userID int) ([]Expense, error) {
-	query := `SELECT * FROM expenses WHERE userid = $1`
+func AddExpense(c *gin.Context) {
+	var body struct {
+		Amount      float64
+		Categoryid  uint
+		Description string
+		Date        string
+	}
+	if err := c.Bind(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
 
-	rows, err := db.Query(query, userID)
+	layout := "01/02/2006"
+
+	parsedDate, err := time.Parse(layout, body.Date)
 	if err != nil {
-		return nil, err
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	newExpense := Expense{
+		Userid:      uint(userID),
+		Categoryid:  body.Categoryid,
+		Amount:      body.Amount,
+		Description: body.Description,
+		Date:        parsedDate,
 	}
 
-	defer rows.Close()
+	result := databaseLogic.DB.Create(&newExpense)
 
-	var expenses []Expense
-	for rows.Next() {
-		var expense Expense
-		if err := rows.Scan(&expense.ExpenseID, &expense.UserID, &expense.CategoryID, &expense.Amount, &expense.Description, &expense.Date, &expense.CreatedAt); err != nil {
-			fmt.Printf("error scanning row: %v ", err)
-		}
-		expenses = append(expenses, expense)
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to add expense",
+		})
+		return
 	}
-	return expenses, nil
-}
 
-func GetExpensesByUserID(db *sql.DB, userID int) ([]Expense, error) {
-	query := "SELECT expenseid, amount, categoryid, description, date FROM expenses WHERE userID = $1"
-	rows, err := db.Query(query, userID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var expenses []Expense
-	for rows.Next() {
-		var expense Expense
-		if err := rows.Scan(&expense.ExpenseID, &expense.Amount, &expense.CategoryID, &expense.Description, &expense.Date); err != nil {
-			return nil, err
-		}
-		expenses = append(expenses, expense)
-	}
-	return expenses, nil
+	//Response
+	c.JSON(http.StatusOK, gin.H{})
 }

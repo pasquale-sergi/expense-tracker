@@ -25,9 +25,10 @@ const store = createStore({
         async loginUser({ commit }, { username, password }) {
             try {
                 const response = await axios.post("http://localhost:8090/login", { username, password });
-                commit('set_login_status', { success: response.data.success, message: response.data.message })
+
                 console.log(response)
-                if (response.data.success) {
+                if (response.status == 200) {
+                    commit('set_login_status', { success: true, message: "Logged in" })
                     router.push("/home")
                 }
 
@@ -40,10 +41,11 @@ const store = createStore({
         },
         async registerUser({ commit }, { username, email, password }) {
             try {
-                const response = await axios.post("http://localhost:8090/register", { username, email, password })
-                commit('set_registered_status', { success: response.data.success })
-                if (response.data.success) {
-                    router.push("/home")
+                const response = await axios.post("http://localhost:8090/signup", { username, email, password })
+
+                if (response.status == 200) {
+                    commit('set_registered_status', { success: true })
+                    router.push("/login")
                 }
             } catch (error) {
                 commit('set_registered_status', { success: false })
