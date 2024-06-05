@@ -16,13 +16,15 @@ import (
 
 func RequireAuth(c *gin.Context) {
 	//get the cookie off req
-	tokenString, err := c.Cookie("Authorization")
+	tokenString := user.Cookie
 	fmt.Print("TOKEN: ", tokenString)
-	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
-	}
+	// if err != nil {
+	// 	c.AbortWithStatus(http.StatusUnauthorized)
+	// 	c.Abort()
+	// 	return
+	// }
 	//decode/validate it
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -36,7 +38,9 @@ func RequireAuth(c *gin.Context) {
 		//check the exp
 
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token expired"})
+			c.Abort()
+			return
 		}
 
 		//find the user with token sub
@@ -53,6 +57,7 @@ func RequireAuth(c *gin.Context) {
 		c.Next()
 
 	} else {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		c.Abort()
 	}
 }

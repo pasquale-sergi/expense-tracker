@@ -9,7 +9,7 @@
       {{ expense.Date }}
     </div>
     <div class="expHistory">
-      <button @click="showExpHistory">Show Expenses History</button>
+      <button @click="getExpenseHistory">Show Expenses History</button>
       <div v-if="showHistory">
         <div v-for="expense in expensesHistory" :key="expense.ExpenseID">
           Amount: {{ expense.Amount }}, Description: {{ expense.Description }},
@@ -38,7 +38,13 @@ export default {
   methods: {
     async getCurrentExpenses() {
       const response = await axios.get("http://localhost:8090/currentExpenses");
-      console.log(response);
+      this.expenses = response.data;
+      console.log("RESPONSE: ", response);
+    },
+    async getExpenseHistory() {
+      this.showHistory = !this.showHistory;
+      const response = await axios.get("http://localhost:8090/expensesHistory");
+      this.expensesHistory = response.data;
     },
   },
 };

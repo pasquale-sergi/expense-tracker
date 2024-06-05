@@ -45,6 +45,7 @@ func ListExpensesCurrentMonth(c *gin.Context) {
 	var tempExpenses []Expense
 
 	// Query the database
+	fmt.Print("USERID INTO THE EXPENSE FUNC : ", userID)
 	result := databaseLogic.DB.Where("userid = ? AND date BETWEEN ? AND ?", userID, startOfMonth, endOfMonth).Find(&tempExpenses)
 
 	// Check for errors
@@ -54,6 +55,7 @@ func ListExpensesCurrentMonth(c *gin.Context) {
 	}
 
 	expenses = append(expenses, tempExpenses...)
+	fmt.Print(expenses)
 	c.JSON(http.StatusOK, expenses)
 
 }
@@ -100,4 +102,16 @@ func AddExpense(c *gin.Context) {
 
 	//Response
 	c.JSON(http.StatusOK, gin.H{})
+}
+
+func GetAllExpenses(c *gin.Context) {
+	var expenses []Expense
+
+	result := databaseLogic.DB.Find(&expenses)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, expenses) // Return all expenses data
 }

@@ -5,6 +5,7 @@ import router from './routes'
 import createPersistedState from 'vuex-persistedstate'
 
 
+
 const store = createStore({
     state: {
         isLogged: false,
@@ -19,20 +20,19 @@ const store = createStore({
         },
         set_registered_status(state, success) {
             state.isRegistered = success;
-        }
+        },
+
     },
     actions: {
         async loginUser({ commit }, { username, password }) {
             try {
-                const response = await axios.post("http://localhost:8090/login", { username, password });
+                const response = await axios.post("http://localhost:8090/login", { username, password }, { withCredentials: true });
 
                 console.log(response)
                 if (response.status == 200) {
-                    commit('set_login_status', { success: true, message: "Logged in" })
+                    commit('set_login_status', { success: true, message: "Logged in" });
                     router.push("/home")
                 }
-
-
             } catch (error) {
                 commit('set_login_status', { success: false, message: "User not found" })
                 console.error('Error calling login API: ', error);
@@ -52,9 +52,16 @@ const store = createStore({
                 console.error("Error calling the registration API: ", error)
             }
         },
-        logout({ commit }) {
-            commit('set_login_status', { success: false })
-            router.push("/login")
+        async logout({ commit }) {
+            try {
+                await axios.post("http://localhost:8090/logout")
+                commit('set_login_status', { success: false })
+                router.push("/login")
+                console.log("Logged out")
+            } catch (err) {
+                console.error("Error logging out: ", err)
+            }
+
         }
 
     },

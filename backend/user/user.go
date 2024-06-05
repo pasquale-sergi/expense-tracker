@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -17,6 +18,10 @@ type User struct {
 	Email    string `gorm: "unique"`
 	Password string
 }
+
+var userID uint
+
+var Cookie string
 
 func Signup(c *gin.Context) {
 	//Get the email/pass off the req
@@ -103,16 +108,25 @@ func Login(c *gin.Context) {
 	//send it back
 	//set the cookie
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
-	c.JSON(http.StatusOK, gin.H{})
+	c.SetCookie("auth-token", tokenString, 3600*24*30, "/", "localhost", false, true)
+	Cookie, _ = c.Cookie("auth-token")
+	fmt.Print("COOKIE: ", Cookie)
+
+	// Validate(c)
+	userID = user.ID
+	c.JSON(http.StatusOK, gin.H{"message": "Logged in successfully", "userID": user.ID})
+
 }
 
-var userID uint
+// func Validate(c *gin.Context) {
+// 	user, _ := c.Get("user")
+// 	userID = user.(User).ID
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"message": userID,
+// 	})
+// }
 
-func Validate(c *gin.Context) {
-	user, _ := c.Get("user")
-	userID = user.(User).ID
-	c.JSON(http.StatusOK, gin.H{
-		"message": userID,
-	})
+func Logout(c *gin.Context) {
+	c.SetCookie("Authorization", "", -1, "/", "localhost", false, true)
+	c.String(http.StatusOK, "Cookie has been deleted")
 }
