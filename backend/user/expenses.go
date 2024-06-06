@@ -10,12 +10,12 @@ import (
 )
 
 type Expense struct {
-	expenseid   uint `gorm: "primaryKey"`
-	Userid      uint
-	Categoryid  uint
-	Amount      float64
-	Description string
-	Date        time.Time
+	expenseid    uint `gorm: "primaryKey"`
+	Userid       uint
+	Categoryname string
+	Amount       float64
+	Description  string
+	Date         time.Time
 }
 
 func ListExpenses(c *gin.Context) {
@@ -62,10 +62,10 @@ func ListExpensesCurrentMonth(c *gin.Context) {
 
 func AddExpense(c *gin.Context) {
 	var body struct {
-		Amount      float64
-		Categoryid  uint
-		Description string
-		Date        string
+		Amount       float64
+		Categoryname string
+		Description  string
+		Date         string
 	}
 	if err := c.Bind(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -84,11 +84,11 @@ func AddExpense(c *gin.Context) {
 		return
 	}
 	newExpense := Expense{
-		Userid:      uint(userID),
-		Categoryid:  body.Categoryid,
-		Amount:      body.Amount,
-		Description: body.Description,
-		Date:        parsedDate,
+		Userid:       uint(userID),
+		Categoryname: body.Categoryname,
+		Amount:       body.Amount,
+		Description:  body.Description,
+		Date:         parsedDate,
 	}
 
 	result := databaseLogic.DB.Create(&newExpense)
