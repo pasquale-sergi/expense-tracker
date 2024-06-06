@@ -41,6 +41,7 @@ func main() {
 	r.GET("/expenses", middleware.RequireAuth, user.GetAllExpenses)
 	r.POST("/addIncome", middleware.RequireAuth, user.AddIncome)
 	r.GET("/incomeHistory", middleware.RequireAuth, user.IncomeHistory)
+	r.GET("/balance", middleware.RequireAuth, user.UserBalance)
 
 	r.Run()
 
