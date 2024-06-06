@@ -1,10 +1,9 @@
 <template>
-  <div class="addExp">
-    <hr class="vertical" />
-    <div id="new">
+  <div class="add-exp">
+    <div class="form-container">
       <h2>Add new Expense</h2>
       <div class="inputs">
-        <div class="inputitem">
+        <div class="input-item">
           <label class="label">Description:</label>
           <input
             id="name"
@@ -22,7 +21,7 @@
             v-model="expenseAmount"
           />
         </div>
-        <div class="inputitem">
+        <div class="input-item">
           <label class="label">Category:</label>
           <select name="category" v-model="categoryChoice">
             <option v-for="category in categoryOptions" :key="category">
@@ -31,7 +30,7 @@
           </select>
         </div>
 
-        <div class="inputitem">
+        <div class="input-item">
           <label class="label">Date:</label>
           <input type="text" placeholder="date" v-model="expenseDate" />
         </div>
@@ -102,22 +101,86 @@ export default {
 
 
 <style scoped>
-.addExp {
-  border: solid 2px black;
-  width: 50%;
+.add-exp {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
   margin: auto;
 }
-.inputitem {
-  align-content: center;
-  align-items: center;
+
+.form-container {
+  width: 100%;
+}
+
+h2 {
   text-align: center;
+  color: #333;
+}
+
+.inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.input-item {
+  display: flex;
+  flex-direction: column;
 }
 
 .label {
-  display: grid;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+input,
+select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 button {
-  margin-top: 5px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  margin-top: 10px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+p {
+  text-align: center;
+  color: #28a745;
+  font-weight: bold;
+  margin-top: 10px;
 }
 </style>

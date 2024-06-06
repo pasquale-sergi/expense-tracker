@@ -1,47 +1,51 @@
 <template>
-  <div class="incomeSec">
-    <h2>Income</h2>
-    <div class="input">
-      <label class="label" for="income">Income</label>
-      <input
-        class="input"
-        type="number"
-        placeholder="income amount"
-        v-model="incomeAmount"
-      />
-    </div>
-    <div class="input">
-      <label class="label" for="income">Description</label>
-      <input
-        class="input"
-        type="text"
-        placeholder="description"
-        v-model="incomeDescr"
-      />
-    </div>
-    <div class="input">
-      <label class="label" for="date">Date</label>
-      <input
-        class="input"
-        type="text"
-        placeholder="date"
-        v-model="incomeDate"
-      />
-    </div>
-    <div class="input">
-      {{ message }}
-      <button @click="addIncome">Add Income</button>
-    </div>
-  </div>
-  <div class="incomeHistory">
-    <div v-if="showIncomeHistory">
-      <div v-for="income in incomeRecords" :key="income">
-        Amount: {{ income.Amount }}, Description: {{ income.Description }},
-        Date:
-        {{ income.Date }}
+  <div class="income-section">
+    <div class="form-container">
+      <h2>Income</h2>
+      <div class="input-group">
+        <label class="label" for="income">Income</label>
+        <input
+          class="input"
+          type="number"
+          placeholder="income amount"
+          v-model="incomeAmount"
+        />
+      </div>
+      <div class="input-group">
+        <label class="label" for="income">Description</label>
+        <input
+          class="input"
+          type="text"
+          placeholder="description"
+          v-model="incomeDescr"
+        />
+      </div>
+      <div class="input-group">
+        <label class="label" for="date">Date</label>
+        <input
+          class="input"
+          type="text"
+          placeholder="date"
+          v-model="incomeDate"
+        />
+      </div>
+      <div class="input-group">
+        <button @click="addIncome" class="btn-primary">Add Income</button>
+        <p>{{ message }}</p>
       </div>
     </div>
-    <button @click="incomeHistory">Show Income History</button>
+    <div class="income-history">
+      <button @click="incomeHistory" class="btn-secondary">
+        {{ showIncomeHistory ? "Hide" : "Show" }} Income History
+      </button>
+      <div v-if="showIncomeHistory" class="history-list">
+        <div v-for="income in incomeRecords" :key="income">
+          Amount: ${{ income.Amount.toFixed(2) }}, Description:
+          {{ income.Description }}, Date:
+          {{ income.Date }}
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -90,21 +94,95 @@ export default {
 </script>
 
 <style scoped>
-.incomeSec {
-  display: inline-block;
-  border: solid 2px black;
-  width: 50%;
-  margin: auto;
+.income-section {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+.form-container {
+  width: 100%;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
 .input {
-  margin-top: 4px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
-.label {
-  margin-right: 10px;
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
 }
 
-.label {
-  display: grid;
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+p {
+  text-align: center;
+  color: #28a745;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.income-history {
+  margin-top: 20px;
+}
+
+.history-list {
+  margin-top: 20px;
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+}
+
+.history-list div {
+  margin-bottom: 10px;
+  font-size: 14px;
 }
 </style>

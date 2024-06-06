@@ -1,6 +1,6 @@
 <template>
   <h2>Current Balance</h2>
-  <div class="balance">$ {{ parseFloat(balance) }}</div>
+  <div class="balance">$ {{ parseFloat(balance).toFixed(2) }}</div>
 </template>
 
 <script>
@@ -13,7 +13,13 @@ export default {
   },
   created() {
     this.getBalance();
+    this.intervalId = setInterval(this.getBalance, 5000);
   },
+  beforeUnmount() {
+    // Clear the interval when the component is destroyed
+    clearInterval(this.intervalId);
+  },
+
   methods: {
     async getBalance() {
       try {
