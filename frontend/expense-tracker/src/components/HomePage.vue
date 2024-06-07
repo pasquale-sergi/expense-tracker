@@ -24,7 +24,7 @@ import AddExpense from "./Expense/AddExpense.vue";
 import IncomeSection from "./Income/IncomeSection.vue";
 import UserBalance from "./User/UserBalance.vue";
 import { mapGetters } from "vuex";
-import ExpenseSummary from "./Expense/ExpenseSummary.vue";
+import ExpenseSummary from "./SummarySituation/ExpenseSummary.vue";
 
 export default {
   components: {
@@ -66,7 +66,8 @@ export default {
 
 .expenses,
 .add-expense,
-.income {
+.income,
+.summary {
   padding: 20px;
   background-color: #f9f9f9;
   border-radius: 10px;

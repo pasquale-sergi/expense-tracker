@@ -1,18 +1,20 @@
-<template>
-  <nav class="navbar">
+  <template>
+  <nav class="navbar" v-if="isLogged">
     <p class="user-welcome" v-if="isLogged">
       Welcome Back {{ capitalizeFirstLetter(username) }}
     </p>
 
-    <button v-if="isLogged" @click="logoutUser">Logout</button>
+    <button v-if="isLogged" @click="logoutUser" class="logout-btn">
+      Logout
+    </button>
   </nav>
 
-  <login-user v-if="!isLogged"></login-user>
+  <login-user v-if="!isLogged" class="login-box"></login-user>
 
   <home-page v-if="isLogged"></home-page>
 </template>
 
-<script>
+  <script>
 import { mapGetters, mapActions } from "vuex";
 import LoginUser from "./components/User/LoginUser.vue";
 // import RegisterUser from './components/RegisterUser.vue';
@@ -62,23 +64,58 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Ensures the container takes the full height of the viewport */
+  margin: 0; /* Remove any default margin */
 }
+
 .navbar {
   display: flex;
-  border: solid 2px solid;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
   padding: 20px;
+  border: solid 1px black;
+  margin-bottom: 20px;
+  border-radius: 8px;
 }
 
 .user-welcome {
-  font-size: 30px;
-  margin-left: 45%;
+  font-size: 25px;
+}
+
+.login-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: solid 1px black;
+  padding: 20px;
+  border-radius: 25px;
+  width: 450px; /* Adjust the width as needed */
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional: add a shadow for better visual appearance */
+  background-color: #fff; /* Optional: add a background color */
+  margin: auto; /* Center the login box */
+  margin-top: 10%;
+}
+
+html,
+body {
+  height: 100%; /* Ensure the body takes up the full height of the viewport */
+  margin: 0; /* Remove default margin */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

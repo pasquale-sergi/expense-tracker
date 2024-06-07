@@ -45,6 +45,8 @@ func main() {
 	r.GET("/categories", middleware.RequireAuth, user.GetCategories)
 	r.POST("/addCategory", middleware.RequireAuth, user.AddCategory)
 	r.GET("/username", middleware.RequireAuth, user.GetUsername)
+	r.GET("/summaryByCategoryMonth", middleware.RequireAuth, user.GroupExpensesOfTheMonthByCategory)
+	r.GET("/summaryByCategory", middleware.RequireAuth, user.GroupAllExpensesByCategory)
 
 	r.Run()
 
