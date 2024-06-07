@@ -1,7 +1,9 @@
 <template>
-  <nav>
-    <p v-if="isLogged">You are logged</p>
-    <p v-else>You are not logged</p>
+  <nav class="navbar">
+    <p class="user-welcome" v-if="isLogged">
+      Welcome Back {{ capitalizeFirstLetter(username) }}
+    </p>
+
     <button v-if="isLogged" @click="logoutUser">Logout</button>
   </nav>
 
@@ -12,7 +14,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import LoginUser from "./components/LoginUser.vue";
+import LoginUser from "./components/User/LoginUser.vue";
 // import RegisterUser from './components/RegisterUser.vue';
 import HomePage from "./components/HomePage.vue";
 import axios from "axios";
@@ -22,6 +24,14 @@ export default {
   components: {
     LoginUser,
     HomePage,
+  },
+  data() {
+    return {
+      username: "",
+    };
+  },
+  created() {
+    this.getUsername();
   },
   computed: {
     ...mapGetters(["isLogged"]),
@@ -37,6 +47,17 @@ export default {
         console.log("Issues with the log out");
       }
     },
+    async getUsername() {
+      try {
+        const response = await axios.get("http://localhost:8090/username");
+        this.username = response.data.username;
+      } catch (err) {
+        console.log("Error retrieving the username");
+      }
+    },
+    capitalizeFirstLetter(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    },
   },
 };
 </script>
@@ -49,5 +70,15 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.navbar {
+  display: flex;
+  border: solid 2px solid;
+  padding: 20px;
+}
+
+.user-welcome {
+  font-size: 30px;
+  margin-left: 45%;
 }
 </style>

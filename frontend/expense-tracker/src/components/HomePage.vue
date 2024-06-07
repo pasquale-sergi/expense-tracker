@@ -1,5 +1,4 @@
 <template>
-  <h2>Home Page</h2>
   <div class="balance">
     <user-balance></user-balance>
   </div>
@@ -13,15 +12,19 @@
     <div class="income">
       <income-section></income-section>
     </div>
+    <div class="summary">
+      <expense-summary></expense-summary>
+    </div>
   </div>
 </template>
 
 <script>
-import ExpensesList from "./ExpensesList.vue";
-import AddExpense from "./AddExpense.vue";
-import IncomeSection from "./IncomeSection.vue";
-import UserBalance from "./UserBalance.vue";
+import ExpensesList from "./Expense/ExpensesList.vue";
+import AddExpense from "./Expense/AddExpense.vue";
+import IncomeSection from "./Income/IncomeSection.vue";
+import UserBalance from "./User/UserBalance.vue";
 import { mapGetters } from "vuex";
+import ExpenseSummary from "./Expense/ExpenseSummary.vue";
 
 export default {
   components: {
@@ -29,6 +32,7 @@ export default {
     AddExpense,
     IncomeSection,
     UserBalance,
+    ExpenseSummary,
   },
   computed: {
     ...mapGetters(["isLogged"]),

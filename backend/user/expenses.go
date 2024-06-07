@@ -29,6 +29,8 @@ func ListExpenses(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, expenses) // Return all expenses data
+
+	//modify this to be history per month
 }
 
 func ListExpensesCurrentMonth(c *gin.Context) {

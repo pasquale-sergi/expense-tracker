@@ -118,13 +118,22 @@ func Login(c *gin.Context) {
 
 }
 
-// func Validate(c *gin.Context) {
-// 	user, _ := c.Get("user")
-// 	userID = user.(User).ID
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"message": userID,
-// 	})
-// }
+func GetUsername(c *gin.Context) {
+	var user User
+
+	// Assuming `userID` is already defined
+	res := databaseLogic.DB.Select("username").Where("id = ?", userID).First(&user)
+	if res.Error != nil {
+		fmt.Println("Error finding the username:", res.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get username"})
+		return
+	}
+
+	username := user.Username
+	fmt.Println("Username:", username)
+
+	c.JSON(http.StatusOK, gin.H{"username": username})
+}
 
 func Logout(c *gin.Context) {
 	c.SetCookie("Authorization", "", -1, "/", "localhost", false, true)

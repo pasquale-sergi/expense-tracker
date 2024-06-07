@@ -44,6 +44,7 @@ func main() {
 	r.GET("/balance", middleware.RequireAuth, user.UserBalance)
 	r.GET("/categories", middleware.RequireAuth, user.GetCategories)
 	r.POST("/addCategory", middleware.RequireAuth, user.AddCategory)
+	r.GET("/username", middleware.RequireAuth, user.GetUsername)
 
 	r.Run()
 
