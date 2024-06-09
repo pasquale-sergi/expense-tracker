@@ -12,9 +12,9 @@
     <div class="income">
       <income-section></income-section>
     </div>
-    <div class="summary">
-      <expense-summary></expense-summary>
-    </div>
+  </div>
+  <div class="summary">
+    <expense-summary></expense-summary>
   </div>
 </template>
 

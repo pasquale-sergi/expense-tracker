@@ -60,8 +60,6 @@ defineProps({
 }
 
 .summary-table {
-  margin-left: 230px;
-  margin-top: 20px;
   border: solid 2px black;
 }
 
