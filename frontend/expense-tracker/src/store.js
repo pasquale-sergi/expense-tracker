@@ -42,7 +42,7 @@ const store = createStore({
         async registerUser({ commit }, { username, email, password }) {
             try {
                 const response = await axios.post("http://localhost:8090/signup", { username, email, password })
-
+                console.log(response)
                 if (response.status == 200) {
                     commit('set_registered_status', { success: true })
                     router.push("/login")

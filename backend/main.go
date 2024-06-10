@@ -38,7 +38,6 @@ func main() {
 	r.GET("/expensesHistory", middleware.RequireAuth, user.ListExpenses)
 	r.GET("/currentExpenses", middleware.RequireAuth, user.ListExpensesCurrentMonth)
 	r.POST("/addExpense", middleware.RequireAuth, user.AddExpense)
-	r.GET("/expenses", middleware.RequireAuth, user.GetAllExpenses)
 	r.POST("/addIncome", middleware.RequireAuth, user.AddIncome)
 	r.GET("/incomeHistory", middleware.RequireAuth, user.IncomeHistory)
 	r.GET("/balance", middleware.RequireAuth, user.UserBalance)
@@ -47,6 +46,7 @@ func main() {
 	r.GET("/username", middleware.RequireAuth, user.GetUsername)
 	r.GET("/summaryByCategoryMonth", middleware.RequireAuth, user.GroupExpensesOfTheMonthByCategory)
 	r.GET("/summaryByCategory", middleware.RequireAuth, user.GroupAllExpensesByCategory)
+	r.POST("/fixedExpenses", middleware.RequireAuth, user.SetFixedExpenses)
 
 	r.Run()
 

@@ -18,6 +18,15 @@ type Expense struct {
 	Date         time.Time
 }
 
+// fixed expenses table struct
+type FixedExpenses struct {
+	id            uint `gorm: "primaryKey"`
+	Name          string
+	Amount        float64
+	Category_name string
+	Date          time.Time
+}
+
 func ListExpenses(c *gin.Context) {
 
 	var expenses []Expense
@@ -106,14 +115,53 @@ func AddExpense(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-func GetAllExpenses(c *gin.Context) {
-	var expenses []Expense
+// set fixed expenses
+func SetFixedExpenses(c *gin.Context) {
+	var body struct {
+		Name         string
+		Amount       float64
+		Categoryname string
+	}
 
-	result := databaseLogic.DB.Find(&expenses)
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+	if err := c.Bind(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+	}
+
+	newFixedExpense := FixedExpenses{
+		Name:          body.Name,
+		Amount:        body.Amount,
+		Category_name: body.Categoryname,
+		Date:          time.Now(),
+	}
+
+	res := databaseLogic.DB.Create(&newFixedExpense)
+
+	if res.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to add expense",
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, expenses) // Return all expenses data
+	//add the fixed expense to the expenses
+
+	newExpense := Expense{
+		Userid:       uint(userID),
+		Categoryname: body.Categoryname,
+		Amount:       body.Amount,
+		Description:  body.Name,
+		Date:         time.Now(),
+	}
+
+	result := databaseLogic.DB.Create(&newExpense)
+
+	if result.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to add expense",
+		})
+		return
+	}
+
+	//Response
+	c.JSON(http.StatusOK, gin.H{"message": "added"})
 }

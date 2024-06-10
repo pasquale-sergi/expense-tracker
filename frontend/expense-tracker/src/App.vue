@@ -8,28 +8,29 @@
       Logout
     </button>
   </nav>
-
-  <login-user v-if="!isLogged" class="login-box"></login-user>
+  <div class="auth-box">
+    <auth-wrapper v-if="!isLogged"></auth-wrapper>
+  </div>
 
   <home-page v-if="isLogged"></home-page>
 </template>
 
   <script>
 import { mapGetters, mapActions } from "vuex";
-import LoginUser from "./components/User/LoginUser.vue";
-// import RegisterUser from './components/RegisterUser.vue';
+import AuthWrapper from "./components/User/AuthWrapper.vue";
 import HomePage from "./components/HomePage.vue";
 import axios from "axios";
 
 export default {
   name: "App",
   components: {
-    LoginUser,
     HomePage,
+    AuthWrapper,
   },
   data() {
     return {
       username: "",
+      isLoginView: true,
     };
   },
   created() {
@@ -93,21 +94,6 @@ export default {
 
 .user-welcome {
   font-size: 25px;
-}
-
-.login-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: solid 1px black;
-  padding: 20px;
-  border-radius: 25px;
-  width: 450px; /* Adjust the width as needed */
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Optional: add a shadow for better visual appearance */
-  background-color: #fff; /* Optional: add a background color */
-  margin: auto; /* Center the login box */
-  margin-top: 10%;
 }
 
 html,

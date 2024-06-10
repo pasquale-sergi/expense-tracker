@@ -39,6 +39,17 @@
       <p>{{ message }}</p>
       <button @click="showPop">Add Category</button>
       <add-category v-if="showPopUp"></add-category>
+      <div class="fixed-exp">
+        <button class="fixed-exp" @click="toggleFixedForm">
+          Set Fixed Expenses
+        </button>
+
+        <fixed-expenses
+          v-if="showFixedForm"
+          @close-popup="toggleFixedForm"
+          :categoryOptions="categoryOptions"
+        ></fixed-expenses>
+      </div>
     </div>
   </div>
 </template>
@@ -47,9 +58,11 @@
 <script>
 import axios from "axios";
 import AddCategory from "./AddCategory.vue";
+import FixedExpenses from "./FixedExpenses.vue";
 export default {
   components: {
     AddCategory,
+    FixedExpenses,
   },
   data() {
     return {
@@ -61,6 +74,7 @@ export default {
       categoryOptions: [],
       categoryChoice: "",
       showPopUp: false,
+      showFixedForm: false,
     };
   },
   created() {
@@ -94,6 +108,9 @@ export default {
     showPop() {
       this.showPopUp = !this.showPopUp;
       console.log(this.showPopUp);
+    },
+    toggleFixedForm() {
+      this.showFixedForm = !this.showFixedForm;
     },
   },
 };
@@ -181,6 +198,10 @@ p {
   text-align: center;
   color: #28a745;
   font-weight: bold;
+  margin-top: 10px;
+}
+
+.fixed-exp {
   margin-top: 10px;
 }
 </style>

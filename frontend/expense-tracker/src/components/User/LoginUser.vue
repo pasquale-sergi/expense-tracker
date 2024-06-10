@@ -26,8 +26,8 @@
       </div>
       <button class="login" type="submit">Login</button>
       <div class="footer">
-        <router-link to="/register"
-          >Are you not registered? Do it Right Now</router-link
+        <a href="#" @click.prevent="switchToRegister"
+          >Are you not registered? Do it Right Now</a
         >
       </div>
     </form>
@@ -54,6 +54,9 @@ export default {
         username: this.username,
         password: this.password,
       });
+    },
+    switchToRegister() {
+      this.$emit("switch-view", "register");
     },
   },
 };
@@ -106,7 +109,7 @@ export default {
   border: none;
   border-radius: 30px;
   font-weight: 600;
-  margin-top: 10px;
+  margin-top: 30px;
   padding: 10px 25px 10px 25px;
 }
 .footer {
@@ -115,9 +118,9 @@ export default {
   color: hsl(0deg 0% 37%);
   gap: 14em;
   padding-bottom: 10em;
-  margin-top: 10px;
+  margin-top: 20px;
   width: 80%;
-  margin: 10px 30px 10px 130px;
+  margin: 10px 30px 10px 90px;
 }
 
 button {

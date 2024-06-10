@@ -47,6 +47,7 @@ import axios from "axios";
 import ExpenseHistory from "./ExpenseHistory.vue";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap";
+
 export default {
   components: {
     ExpenseHistory,
@@ -92,7 +93,6 @@ export default {
     async toggleExpenseHistory() {
       this.showHistory = !this.showHistory;
       if (this.showHistory) {
-        console.log(this.showHistory);
         const response = await axios.get(
           "http://localhost:8090/expensesHistory"
         );
