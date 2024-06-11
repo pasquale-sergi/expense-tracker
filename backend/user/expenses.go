@@ -165,3 +165,17 @@ func SetFixedExpenses(c *gin.Context) {
 	//Response
 	c.JSON(http.StatusOK, gin.H{"message": "added"})
 }
+
+func DeleteExpense(c *gin.Context) {
+	var expense Expense
+
+	description := c.Param("description")
+
+	res := databaseLogic.DB.Where("description = ?", description).Delete(&expense)
+
+	if res.Error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": res.Error})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "deleted"})
+}

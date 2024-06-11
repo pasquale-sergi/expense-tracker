@@ -54,6 +54,7 @@ export default {
         username: this.username,
         password: this.password,
       });
+      this.$emit("login-success");
     },
     switchToRegister() {
       this.$emit("switch-view", "register");

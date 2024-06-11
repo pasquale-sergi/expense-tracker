@@ -9,6 +9,7 @@
           <th class="descr_content">Description</th>
           <th class="content">Amount</th>
           <th class="content">Date</th>
+          <th class="delete">Delete</th>
         </tr>
         <tr
           class="columns-content"
@@ -18,6 +19,14 @@
           <td class="descr_content">{{ expense.Description }}</td>
           <td class="content">${{ expense.Amount.toFixed(2) }}</td>
           <td class="content">{{ formatDate(expense.Date) }}</td>
+          <td class="content">
+            <button
+              class="delete-exp"
+              @click="deleteExpense(expense.Description)"
+            >
+              x
+            </button>
+          </td>
         </tr>
       </table>
     </div>
@@ -123,6 +132,20 @@ export default {
         return acc;
       }, {});
     },
+    async deleteExpense(description) {
+      try {
+        await axios.delete(
+          `http://localhost:8090/deleteExpense/${description}`
+        );
+        this.expenses = this.expenses.filter(
+          (expense) => expense.Description !== description
+        );
+        // alert("Expense deleted successfully");
+      } catch (error) {
+        console.error("Error deleting expense:", error);
+        alert("Failed to delete expense");
+      }
+    },
   },
 };
 </script>
@@ -189,6 +212,16 @@ td {
 
 .btn-secondary:hover {
   opacity: 0.9;
+}
+
+.delete-exp {
+  padding: 2px 8px 2px 8px;
+  border: none;
+  border-radius: 100%;
+  background-color: #ddd;
+  color: black;
+  cursor: pointer;
+  margin-left: 12px;
 }
 
 .popup {

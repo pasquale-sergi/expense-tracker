@@ -1,21 +1,19 @@
-  <template>
+<template>
   <nav class="navbar" v-if="isLogged">
-    <p class="user-welcome" v-if="isLogged">
-      Welcome Back {{ capitalizeFirstLetter(username) }}
-    </p>
-
-    <button v-if="isLogged" @click="logoutUser" class="logout-btn">
-      Logout
-    </button>
+    <div class="navbar-content">
+      <p class="user-welcome">
+        Welcome Back, {{ capitalizeFirstLetter(username) }}
+      </p>
+      <button @click="logoutUser" class="logout-btn">Logout</button>
+    </div>
   </nav>
-  <div class="auth-box">
-    <auth-wrapper v-if="!isLogged"></auth-wrapper>
+  <div class="auth-box" v-if="!isLogged">
+    <auth-wrapper @login-success="onLoginSuccess"></auth-wrapper>
   </div>
-
   <home-page v-if="isLogged"></home-page>
 </template>
 
-  <script>
+<script>
 import { mapGetters, mapActions } from "vuex";
 import AuthWrapper from "./components/User/AuthWrapper.vue";
 import HomePage from "./components/HomePage.vue";
@@ -33,11 +31,11 @@ export default {
       isLoginView: true,
     };
   },
-  created() {
-    this.getUsername();
-  },
   computed: {
     ...mapGetters(["isLogged"]),
+  },
+  created() {
+    this.onLoginSuccess();
   },
   methods: {
     ...mapActions(["logout"]),
@@ -61,45 +59,56 @@ export default {
     capitalizeFirstLetter(str) {
       return str.charAt(0).toUpperCase() + str.slice(1);
     },
+    onLoginSuccess() {
+      this.getUsername();
+    },
   },
 };
 </script>
 
 <style scoped>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+.navbar {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  min-height: 100vh; /* Ensures the container takes the full height of the viewport */
-  margin: 0; /* Remove any default margin */
+  align-items: center;
+  width: 100%;
+  background-color: #34495e;
+  color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
 }
 
-.navbar {
+.navbar-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   width: 100%;
-  padding: 20px;
-  border: solid 1px black;
-  margin-bottom: 20px;
-  border-radius: 8px;
+  max-width: 1200px;
 }
 
 .user-welcome {
-  font-size: 25px;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.logout-btn {
+  background-color: rgb(79, 79, 79);
+  color: white;
+  border: solid 1px white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 html,
 body {
-  height: 100%; /* Ensure the body takes up the full height of the viewport */
-  margin: 0; /* Remove default margin */
+  height: 100%;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;

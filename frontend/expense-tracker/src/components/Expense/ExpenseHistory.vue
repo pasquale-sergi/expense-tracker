@@ -1,12 +1,13 @@
 <template>
   <div class="history-list">
-    <div v-for="(expenses, month) in expensesHistory" :key="month">
+    <div v-for="(expenses, month) in localExpensesHistory" :key="month">
       <h3>{{ month }}</h3>
       <table>
         <tr class="title-column">
           <th class="descr_content">Description</th>
           <th class="content">Amount</th>
           <th class="content">Date</th>
+          <td class="delete">Delete</td>
         </tr>
         <tr
           class="columns-content"
@@ -18,6 +19,14 @@
           <td class="content">
             {{ new Date(expense.Date).toLocaleDateString() }}
           </td>
+          <td class="content">
+            <button
+              class="delete-exp"
+              @click="deleteExpense(expense.Description, month)"
+            >
+              x
+            </button>
+          </td>
         </tr>
       </table>
     </div>
@@ -27,6 +36,7 @@
 
 
 <script>
+import axios from "axios";
 export default {
   props: {
     expensesHistory: {
@@ -34,8 +44,18 @@ export default {
       required: true,
     },
   },
-  created() {
-    console.log("Expenses History Prop:", this.expensesHistory); // Log the received prop
+  data() {
+    return {
+      localExpensesHistory: { ...this.expensesHistory },
+    };
+  },
+  watch: {
+    expensesHistory: {
+      immediate: true,
+      handler(newVal) {
+        this.localExpensesHistory = { ...newVal };
+      },
+    },
   },
   methods: {
     closePopup() {
@@ -44,11 +64,44 @@ export default {
     formatDate(date) {
       return new Date(date).toLocaleDateString();
     },
+    async deleteExpense(description, month) {
+      try {
+        const response = await axios.delete(
+          `http://localhost:8090/deleteExpense/${description}`
+        );
+
+        // Check if the response indicates success (HTTP 2xx status codes)
+        if (response.status >= 200 && response.status < 300) {
+          // Remove the deleted expense from the local copy
+          if (this.localExpensesHistory[month]) {
+            this.localExpensesHistory[month] = this.localExpensesHistory[
+              month
+            ].filter((expense) => expense.Description !== description);
+
+            // If the month has no more expenses, remove the month entry
+            if (this.localExpensesHistory[month].length === 0) {
+              delete this.localExpensesHistory[month];
+            }
+          }
+        } else {
+          console.error("Error response:", response);
+          alert("Failed to delete expense");
+        }
+      } catch (error) {
+        console.error("Error deleting expense:", error);
+        alert("Failed to delete expense");
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
+h3 {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
 .history-list {
   padding: 20px;
 }
@@ -82,5 +135,15 @@ td {
   border-radius: 12px;
   padding-right: 10px;
   padding-left: 10px;
+}
+
+.delete-exp {
+  padding: 2px 8px 2px 8px;
+  border: none;
+  border-radius: 100%;
+  background-color: #ddd;
+  color: black;
+  cursor: pointer;
+  margin-left: 12px;
 }
 </style>

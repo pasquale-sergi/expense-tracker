@@ -47,12 +47,7 @@ func main() {
 	r.GET("/summaryByCategoryMonth", middleware.RequireAuth, user.GroupExpensesOfTheMonthByCategory)
 	r.GET("/summaryByCategory", middleware.RequireAuth, user.GroupAllExpensesByCategory)
 	r.POST("/fixedExpenses", middleware.RequireAuth, user.SetFixedExpenses)
+	r.DELETE("/deleteExpense/:description", middleware.RequireAuth, user.DeleteExpense)
 
 	r.Run()
-
-	// mux.Handle("/expenses", handlers.ExpensesHandler(db))
-	// mux.Handle("/expensesHistory", handlers.ExpenseHistoryHandler(db))
-
-	// log.Fatal(http.ListenAndServe(":8090", handler))
-
 }

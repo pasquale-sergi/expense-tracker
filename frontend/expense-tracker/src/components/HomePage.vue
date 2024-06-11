@@ -62,6 +62,7 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 50%;
   margin: auto;
+  margin-top: 110px;
 }
 
 .expenses,
